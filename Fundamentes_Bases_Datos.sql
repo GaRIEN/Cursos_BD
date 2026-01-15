@@ -1,0 +1,64 @@
+CREATE TABLE clients(
+  clientId INT IDENTITY(1,1) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  phone_number varchar(15) NOT NULL,
+  created_at DATETIME2  NOT NULL DEFAULT SYSDATETIME() ,
+  updated_at DATETIME2 NULL
+);
+
+CREATE TABLE products(
+ productId INT IDENTITY(1,1) PRIMARY KEY,
+ name VARCHAR(20) NOT NULL ,
+ slug VARCHAR(200) NOT NULL UNIQUE,
+ description VARCHAR(150),
+ created_at DATETIME2  NOT NULL DEFAULT SYSDATETIME() ,
+ updated_at DATETIME2 NULL
+);
+
+
+
+CREATE TABLE bills(
+ billId  INT IDENTITY(1,1) PRIMARY KEY,
+ clientId INT NOT NULL,
+ total DECIMAL(10,2),
+ status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'PAID', 'CANCELLED')),
+ created_at DATETIME2  NOT NULL DEFAULT SYSDATETIME() ,
+ updated_at DATETIME2 NULL
+ CONSTRAINT FK_bills_clients FOREIGN KEY (clientId) REFERENCES clients(clientId) ON DELETE NO ACTION
+)
+
+CREATE TABLE bills_products(
+ bilproductId  INT IDENTITY(1,1) PRIMARY KEY,
+ billId INT NOT NULL,
+ productId INT NOT NULL,
+ quantity INT NOT NULL CHECK (quantity > 0),
+ unit_price DECIMAL(10,2) NOT NULL,
+ created_at DATETIME2  NOT NULL DEFAULT SYSDATETIME() ,
+ updated_at DATETIME2 NULL,
+ CONSTRAINT FK_bills_products_bills FOREIGN KEY (billId) REFERENCES bills(billId) ON DELETE CASCADE,
+ CONSTRAINT FK_bills_products_products FOREIGN KEY (productId) REFERENCES products(productId) ON DELETE NO ACTION,
+)
+
+CREATE TABLE TEST (
+testId INT IDENTITY(1,1) PRIMARY KEY,
+name VARCHAR(120) NOT NULL ,
+qty INT,
+created_at DATETIME2  NOT NULL DEFAULT SYSDATETIME() ,
+
+);
+
+-- ==========================================
+SELECT * FROM TEST
+
+--AGREGAR COLUMNA
+ALTER TABLE TEST ADD price DECIMAL(10,2) ;
+--ELIMINAR COLUMNA
+ALTER TABLE TEST DROP COLUMN price;
+--MODIFICAR COLUMNA
+ALTER TABLE TEST ALTER COLUMN price DECIMAL(10,2) NOT NULL;
+--modificar nombre columna 
+EXEC sp_rename 'TEST.price', 'prices', 'COLUMN';
+
+--MODIFICAR CNOMBRE TABLA
+EXEC sp_rename 'TEST', 'test';
